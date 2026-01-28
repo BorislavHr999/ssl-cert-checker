@@ -1,6 +1,9 @@
 #!/bin/bash
 
 DOMAIN=$1
+ADMIN_EMAIL= your_email@example.com
+ALERT_DAYS=7
+
 if [ -z "$DOMAIN" ]; then
   echo "Usage: ./check_ssl.sh <domain>"
   exit 1
@@ -41,3 +44,20 @@ fi
 
 echo "==============================="
 echo ""
+
+if [ $DAYS_REMAINING -le $ALERT_DAYS ] && [ $DAYS_REMAINING -ge -2 ] ; then
+   
+   SUBJECT="Subject: SSL Alert: $DOMAIN expires in $DAYS_REMAINING days"
+   
+   BODY="Hello,
+
+   The SSL certificate for domain $DOMAIN expires on $EXPIRY_DATE.
+   There are $DAYS_REMAINING days remaining to the deadline. 
+   
+   This message is auto-generated from Ubuntu. 
+   Don't answer!
+   Don't forget to renew SSL certificate."
+
+    echo -e "$SUBJECT\n\n$BODY" | msmtp -a default $ADMIN_EMAIL
+    echo -e "${YELLOW}>>> Warning email sent to $ADMIN_EMAIL${NC}."
+fi
